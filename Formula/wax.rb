@@ -1,29 +1,20 @@
 class Wax < Formula
   desc "CLI for the Wax MCP server"
   homepage "https://github.com/christopherkarani/Wax"
-  version "0.1.11"
+  url "https://github.com/christopherkarani/Wax/archive/refs/tags/waxmcp-v0.1.11.tar.gz"
+  sha256 "cb543353e3ff84d5043e100ae02794ff33e3d6cadf3569b0ddf8269e8beac867"
   license "MIT"
 
-  on_macos do
-    on_arm do
-      url "https://github.com/christopherkarani/Wax/releases/download/waxmcp-v0.1.11/WaxCLI-darwin-arm64"
-      sha256 "76b10dd86362de6c526a8c2d778a4aab23b30df5952d7fbacf0ec2da7265dba2"
-    end
-    on_intel do
-      url "https://github.com/christopherkarani/Wax/releases/download/waxmcp-v0.1.11/WaxCLI-darwin-x64"
-      sha256 "4509dda05874a4074effacb26df491f5bbade5d071d38b7621474ef0be6c61a1"
-    end
-  end
+  depends_on xcode: ["15.0", :build]
 
   def install
-    if OS.mac? && Hardware::CPU.arm?
-      bin.install "WaxCLI-darwin-arm64" => "wax"
-    elsif OS.mac? && Hardware::CPU.intel?
-      bin.install "WaxCLI-darwin-x64" => "wax"
-    end
+    system "swift", "build", "--disable-sandbox", "-c", "release", "--product", "WaxCLI"
+    bin.install ".build/release/WaxCLI" => "wax"
   end
 
   test do
-    system "#{bin}/wax", "--help"
+    # Check that the binary runs and outputs help
+    output = shell_output("#{bin}/wax --help")
+    assert_match "Usage:", output
   end
 end
