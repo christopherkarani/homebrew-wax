@@ -8,6 +8,11 @@ class Wax < Formula
   depends_on xcode: ["15.0", :build]
 
   def install
+    # The upstream repo defines a `waxTests` target with a custom path of
+    # `Tests/WaxTests`, but empty directories aren't included in GitHub source
+    # archives. Ensure the directory exists so SwiftPM's package graph
+    # validation succeeds.
+    mkdir_p "Tests/WaxTests"
     system "swift", "build", "--disable-sandbox", "-c", "release", "--product", "wax-cli"
     bin.install ".build/release/wax-cli" => "wax"
   end
