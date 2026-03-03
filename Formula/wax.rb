@@ -20,6 +20,6 @@ class Wax < Formula
   test do
     # Check that the binary runs and outputs help
     output = shell_output("#{bin}/wax --help")
-    assert_match "Usage:", output
+    assert_match "USAGE:", output
   end
 end
