@@ -1,10 +1,9 @@
 class Wax < Formula
-  desc "CLI for the Wax MCP server"
+  desc "On-device memory and RAG framework with MCP server for Claude Code"
   homepage "https://github.com/christopherkarani/Wax"
-  url "https://github.com/christopherkarani/Wax/archive/refs/tags/waxmcp-v0.1.13.tar.gz"
-  sha256 "a055f14293a3314395d2d634dabf571e9e9a6127bda8899303ce8893fdb95c0f"
+  url "https://github.com/christopherkarani/Wax/archive/refs/tags/waxmcp-v0.1.15.tar.gz"
+  sha256 "18fb55f459da0fa497eee1afa978fef8ab5046475e8a5cc63c8b00aeeb429816"
   license "MIT"
-  revision 1
 
   depends_on xcode: ["15.0", :build]
 
@@ -20,18 +19,26 @@ class Wax < Formula
       "computeUnitsOrder: [MLComputeUnits] = [.cpuAndNeuralEngine, .all, .cpuOnly]",
       "computeUnitsOrder: [MLComputeUnits] = [.cpuOnly]"
 
-    system "swift", "build", "--disable-sandbox", "-c", "release", "--product", "wax-cli"
-    libexec.install ".build/release/wax-cli" => "wax"
+    system "swift", "build", "--disable-sandbox", "-c", "release",
+           "--product", "wax-cli", "--traits", "default,MCPServer"
+    system "swift", "build", "--disable-sandbox", "-c", "release",
+           "--product", "wax-mcp", "--traits", "default,MCPServer"
+
+    libexec.install ".build/release/wax-cli" => "waxmcp"
+    libexec.install ".build/release/wax-mcp"
     libexec.install Dir[".build/release/*.bundle"]
-    rm_f bin/"wax"
-    bin.write_exec_script libexec/"wax"
+
+    rm_f bin/"waxmcp"
+    rm_f bin/"wax-mcp"
+    bin.write_exec_script libexec/"waxmcp"
+    bin.write_exec_script libexec/"wax-mcp"
   end
 
   test do
-    output = shell_output("#{bin}/wax --help")
+    output = shell_output("#{bin}/waxmcp --help")
     assert_match "USAGE:", output
 
-    health = shell_output("#{bin}/wax vector-health --format text --store-path #{testpath}/health.wax")
+    health = shell_output("#{bin}/waxmcp vector-health --format text --store-path #{testpath}/health.wax")
     assert_match "Vector health: PASS", health
   end
 end
