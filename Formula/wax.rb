@@ -36,4 +36,24 @@ class Wax < Formula
     health = shell_output("#{bin}/waxmcp vector-health --format text --store-path #{testpath}/health.wax")
     assert_match "Vector health: PASS", health
   end
+
+  def caveats
+    <<~EOS
+      This formula installs Swift wax-cli 0.1.32 as `waxmcp` (sqlite user_version 9).
+
+      A global npm package named `waxmcp` (0.1.15) often shadows it:
+        which waxmcp
+      If that path is under nvm/node_modules, `waxmcp stats` fails with
+      "unsupported sqlite user_version 9 (expected 3)".
+
+      Fix:
+        npm uninstall -g waxmcp
+        brew tap christopherkarani/wax
+        brew reinstall wax
+
+      Live family daemon is still:
+        ~/.local/share/waxmcp/runtime/darwin-arm64/wax-cli
+      Do not point Hermes MCP at the npm binary.
+    EOS
+  end
 end
