@@ -1,8 +1,8 @@
 class Wax < Formula
   desc "On-device memory and RAG framework with MCP server for Claude Code"
   homepage "https://github.com/christopherkarani/Wax"
-  url "https://github.com/christopherkarani/Wax/archive/refs/tags/waxmcp-v0.1.33.tar.gz"
-  sha256 "4d0b2303dd57588222b1261e94059be2ea6666256373d4d1f9a3ce2b06b75831"
+  url "https://github.com/christopherkarani/Wax/archive/refs/tags/waxmcp-v0.1.36.tar.gz"
+  sha256 "357b6b6f7d600b3ad347af9a4ed03ce22f5fb078fc66c6018e2b282a4d09100b"
   license "MIT"
 
   depends_on xcode: ["16.3", :build]
@@ -35,25 +35,5 @@ class Wax < Formula
 
     health = shell_output("#{bin}/waxmcp vector-health --format text --store-path #{testpath}/health.wax")
     assert_match "Vector health: PASS", health
-  end
-
-  def caveats
-    <<~EOS
-      This formula installs Swift wax-cli 0.1.32 as `waxmcp` (sqlite user_version 9).
-
-      A global npm package named `waxmcp` (0.1.15) often shadows it:
-        which waxmcp
-      If that path is under nvm/node_modules, `waxmcp stats` fails with
-      "unsupported sqlite user_version 9 (expected 3)".
-
-      Fix:
-        npm uninstall -g waxmcp
-        brew tap christopherkarani/wax
-        brew reinstall wax
-
-      Live family daemon is still:
-        ~/.local/share/waxmcp/runtime/darwin-arm64/wax-cli
-      Do not point Hermes MCP at the npm binary.
-    EOS
   end
 end
